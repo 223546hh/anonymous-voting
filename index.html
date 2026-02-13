@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -49,18 +50,16 @@ background: #cccccc;
 cursor: not-allowed;
 }
 .results {
-margin-top: 25px;
+margin-top: 15px;
 padding: 15px;
 background: #e9e9e9;
 border-radius: 10px;
-max-width: 500px;
-margin: 20px auto;
 text-align: left;
 font-size: 16px;
 color: #333;
 }
 .results strong {
-font-size: 20px;
+font-size: 18px;
 display: block;
 margin-bottom: 10px;
 color: #007aff;
@@ -68,20 +67,41 @@ color: #007aff;
 </style>
 </head>
 <body>
+
 <h1>Anonymous Voting</h1>
+
+<!-- Q1 -->
+
 <div class="poll">
-<p id="question">
-</p>
-<button onclick="vote(0)">Iwahashi</button>
-<button onclick="vote(1)">Consolati</button>
-<button onclick="vote(2)">Cao</button>
+<p>Q1: If the Curfew can be extended, when do you want it to be?<br>
+<small>*Must also consider the safety of students</small></p>
+
+<button onclick="vote(0,0)">7pm</button> <button onclick="vote(0,1)">8pm</button> <button onclick="vote(0,2)">9pm</button> <button onclick="vote(0,3)">10pm</button>
+
+<div id="results0" class="results"></div>
 </div>
-<div id="results" class="results">
-Results:<br>
-Iwahashi: 0<br>
-Consolati: 0<br>
+
+<!-- Q2 -->
+
+<div class="poll">
+<p>Q2: Which acai bowl do you prefer to Uber?</p>
+
+<button onclick="vote(1,0)">Playa</button> <button onclick="vote(1,1)">Sobol</button>
+
+<div id="results1" class="results"></div>
 </div>
-<!-- JavaScriptファイルを読み込む -->
+
+<!-- Q3 -->
+
+<div class="poll">
+<p>Q3: Which Japanese nationally famous anime do you think is also famous worldwide?</p>
+
+<button onclick="vote(2,0)">Pikachu</button> <button onclick="vote(2,1)">Doraemon</button>
+
+<div id="results2" class="results"></div>
+</div>
+
 <script src="script.js"></script>
+
 </body>
-</html
+</html>
