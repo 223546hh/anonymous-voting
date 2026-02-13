@@ -1,30 +1,48 @@
-let votes = [0, 0, 0];
-let voted = false; // 一度投票したら再度投票できないようにするフラグ
-function vote(option) {
-// すでに投票済みなら何もしない
-if (voted) {
-alert("You have already voted!"); // 念のため、投票済みであることを知らせるアラートを出しても良い
+let votes = [
+[0, 0, 0, 0], // Q1
+[0, 0],       // Q2
+[0, 0]        // Q3
+];
+
+let voted = [false, false, false];
+
+function vote(questionIndex, optionIndex) {
+
+if (voted[questionIndex]) {
+alert("You have already voted for this question!");
 return;
 }
-// 選択されたオプションの票を増やす
-votes[option]++;
-// 投票済みフラグをtrueにする
-voted = true;
-// ボタンを無効にする（再度投票できないように）
-document.querySelectorAll('.poll button').forEach(button => {
-button.disabled = true;
-});
-// 結果を表示する
-updateResultsDisplay();
+
+votes[questionIndex][optionIndex]++;
+voted[questionIndex] = true;
+
+// その質問のボタンだけ無効化
+const pollDiv = document.getElementsByClassName("poll")[questionIndex];
+pollDiv.querySelectorAll("button").forEach(btn => btn.disabled = true);
+
+updateResultsDisplay(questionIndex);
 }
-function updateResultsDisplay() {
-const resultsDiv = document.getElementById("results");
-resultsDiv.innerHTML = `
-<strong>Results:</strong><br>
-Iwahashi: ${votes[0]}<br>
-Consolati: ${votes[1]}<br>
-Cao: ${votes[2]}
-`;
+
+function updateResultsDisplay(qIndex) {
+
+let resultsText = "<strong>Results:</strong><br>";
+
+if (qIndex === 0) {
+resultsText += `7pm: ${votes[0][0]}<br>
+8pm: ${votes[0][1]}<br>
+9pm: ${votes[0][2]}<br>
+10pm: ${votes[0][3]}`;
 }
-// ページ読み込み時に初期結果を表示する（これは必須ではないですが、初期状態を明確にするため）
-// document.addEventListener('DOMContentLoaded', updateResultsDisplay);
+
+if (qIndex === 1) {
+resultsText += `Playa: ${votes[1][0]}<br>
+Sobol: ${votes[1][1]}`;
+}
+
+if (qIndex === 2) {
+resultsText += `Pikachu: ${votes[2][0]}<br>
+Doraemon: ${votes[2][1]}`;
+}
+
+document.getElementById("results" + qIndex).innerHTML = resultsText;
+}
