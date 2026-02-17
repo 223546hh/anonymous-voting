@@ -7,8 +7,7 @@
 <body>
   <h1>Anonymous Voting</h1>
 
-  <div id="poll"></div>
-  <div id="results"></div>
+  <div id="polls"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
@@ -33,53 +32,100 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const pollRef = doc(db, "polls", "main");
+    const pollsData = [
+      {
+        id: "curfew",
+        question: "If the Curfew can be extended, when do you want it to be? *Must also consider the safety of students",
+        options: ["7pm", "8pm", "9pm", "10pm"]
+      },
+      {
+        id: "acai",
+        question: "Which acai bowl do you prefer to Uber?",
+        options: ["Playa", "Sobol"]
+      },
+      {
+        id: "anime",
+        question: "Which Japanese nationally famous anime do you think is also famous worldwide?",
+        options: ["Pikachu", "Doraemon"]
+      }
+    ];
 
-    async function createPollIfNotExists() {
-      const docSnap = await getDoc(pollRef);
-      if (!docSnap.exists()) {
-        await setDoc(pollRef, {
-          question: "Which teacher do you like the most?",
-          options: ["Iwahashi", "Consolati", "Cao"],
-          votes: [0, 0, 0]
-        });
+    // Poll を Firestore に作成（存在しない場合）
+    async function createPollsIfNotExist() {
+      for (const poll of pollsData) {
+        const pollRef = doc(db, "polls", poll.id);
+        const docSnap = await getDoc(pollRef);
+        if (!docSnap.exists()) {
+          await setDoc(pollRef, {
+            question: poll.question,
+            options: poll.options,
+            votes: new Array(poll.options.length).fill(0)
+          });
+        }
       }
     }
 
-    async function vote(index) {
+    async function vote(pollId, index) {
+      const pollRef = doc(db, "polls", pollId);
       const docSnap = await getDoc(pollRef);
       const data = docSnap.data();
       data.votes[index] += 1;
       await updateDoc(pollRef, { votes: data.votes });
     }
 
-    function render(data) {
-      const pollDiv = document.getElementById("poll");
-      const resultsDiv = document.getElementById("results");
+    function renderPoll(docSnap, container) {
+      const data = docSnap.data();
+      const pollDiv = document.createElement("div");
+      pollDiv.style.marginBottom = "20px";
 
-      pollDiv.innerHTML = `<h2>${data.question}</h2>`;
+      const title = document.createElement("h2");
+      title.innerText = data.question;
+      pollDiv.appendChild(title);
+
       data.options.forEach((opt, i) => {
         const btn = document.createElement("button");
         btn.innerText = opt;
-        btn.onclick = () => vote(i);
+        btn.style.marginRight = "5px";
+        btn.onclick = () => vote(docSnap.id, i);
         pollDiv.appendChild(btn);
-        pollDiv.appendChild(document.createElement("br"));
       });
 
-      resultsDiv.innerHTML = "<h3>Results</h3>";
-      data.options.forEach((opt, i) => {
-        resultsDiv.innerHTML += `${opt}: ${data.votes[i]} votes<br>`;
+      const resultsDiv = document.createElement("div");
+      resultsDiv.style.marginTop = "10px";
+      const updateResults = () => {
+        resultsDiv.innerHTML = "<b>Results:</b><br>";
+        data.options.forEach((opt, i) => {
+          resultsDiv.innerHTML += `${opt}: ${data.votes[i]} votes<br>`;
+        });
+      };
+
+      updateResults();
+      pollDiv.appendChild(resultsDiv);
+
+      // リアルタイム更新
+      const pollRef = doc(db, "polls", docSnap.id);
+      onSnapshot(pollRef, (snap) => {
+        const updatedData = snap.data();
+        data.votes = updatedData.votes;
+        updateResults();
       });
+
+      container.appendChild(pollDiv);
     }
 
-    await createPollIfNotExists();
+    // 初期化
+    await createPollsIfNotExist();
 
-    onSnapshot(pollRef, (docSnap) => {
+    const container = document.getElementById("polls");
+
+    // 各 Poll を表示
+    pollsData.forEach(async (poll) => {
+      const pollRef = doc(db, "polls", poll.id);
+      const docSnap = await getDoc(pollRef);
       if (docSnap.exists()) {
-        render(docSnap.data());
+        renderPoll(docSnap, container);
       }
     });
   </script>
 </body>
 </html>
-
