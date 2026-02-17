@@ -1,107 +1,84 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Anonymous Voting App</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {
-font-family: Arial, sans-serif;
-background: #f5f5f5;
-padding: 20px;
-}
-h1 {
-text-align: center;
-color: #333;
-}
-.poll {
-background: white;
-padding: 20px;
-border-radius: 10px;
-box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-max-width: 500px;
-margin: 20px auto;
-text-align: center;
-}
-.poll p {
-font-size: 18px;
-margin-bottom: 20px;
-color: #555;
-}
-button {
-display: block;
-width: 100%;
-padding: 12px 20px;
-margin: 8px 0;
-font-size: 16px;
-border: none;
-border-radius: 6px;
-background: #007aff;
-color: white;
-cursor: pointer;
-transition: background-color 0.3s ease;
-}
-button:hover:not(:disabled) {
-background: #0056b3;
-}
-button:disabled {
-background: #cccccc;
-cursor: not-allowed;
-}
-.results {
-margin-top: 15px;
-padding: 15px;
-background: #e9e9e9;
-border-radius: 10px;
-text-align: left;
-font-size: 16px;
-color: #333;
-}
-.results strong {
-font-size: 18px;
-display: block;
-margin-bottom: 10px;
-color: #007aff;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Anonymous Voting</title>
 </head>
 <body>
+  <h1>Anonymous Voting</h1>
 
-<h1>Anonymous Voting</h1>
+  <div id="poll"></div>
+  <div id="results"></div>
 
-<!-- Q1 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc,
+      onSnapshot,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-<div class="poll">
-<p>Q1: If the Curfew can be extended, when do you want it to be?<br>
-<small>*Must also consider the safety of students</small></p>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFke1UF4RkI-Y7HXX7x0I5gfPnls9Bod8",
+      authDomain: "anonymous-voting-72546.firebaseapp.com",
+      projectId: "anonymous-voting-72546",
+      storageBucket: "anonymous-voting-72546.firebasestorage.app",
+      messagingSenderId: "122187938085",
+      appId: "1:122187938085:web:3851149bbb70950a1dc2cc"
+    };
 
-<button onclick="vote(0,0)">7pm</button> <button onclick="vote(0,1)">8pm</button> <button onclick="vote(0,2)">9pm</button> <button onclick="vote(0,3)">10pm</button>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-<div id="results0" class="results"></div>
-</div>
+    const pollRef = doc(db, "polls", "main");
 
-<!-- Q2 -->
+    async function createPollIfNotExists() {
+      const docSnap = await getDoc(pollRef);
+      if (!docSnap.exists()) {
+        await setDoc(pollRef, {
+          question: "Which teacher do you like the most?",
+          options: ["Iwahashi", "Consolati", "Cao"],
+          votes: [0, 0, 0]
+        });
+      }
+    }
 
-<div class="poll">
-<p>Q2: Which acai bowl do you prefer to Uber?</p>
+    async function vote(index) {
+      const docSnap = await getDoc(pollRef);
+      const data = docSnap.data();
+      data.votes[index] += 1;
+      await updateDoc(pollRef, { votes: data.votes });
+    }
 
-<button onclick="vote(1,0)">Playa</button> <button onclick="vote(1,1)">Sobol</button>
+    function render(data) {
+      const pollDiv = document.getElementById("poll");
+      const resultsDiv = document.getElementById("results");
 
-<div id="results1" class="results"></div>
-</div>
+      pollDiv.innerHTML = `<h2>${data.question}</h2>`;
+      data.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.onclick = () => vote(i);
+        pollDiv.appendChild(btn);
+        pollDiv.appendChild(document.createElement("br"));
+      });
 
-<!-- Q3 -->
+      resultsDiv.innerHTML = "<h3>Results</h3>";
+      data.options.forEach((opt, i) => {
+        resultsDiv.innerHTML += `${opt}: ${data.votes[i]} votes<br>`;
+      });
+    }
 
-<div class="poll">
-<p>Q3: Which Japanese nationally famous anime do you think is also famous worldwide?</p>
+    await createPollIfNotExists();
 
-<button onclick="vote(2,0)">Pikachu</button> <button onclick="vote(2,1)">Doraemon</button>
-
-<div id="results2" class="results"></div>
-</div>
-
-<script src="script.js"></script>
-
+    onSnapshot(pollRef, (docSnap) => {
+      if (docSnap.exists()) {
+        render(docSnap.data());
+      }
+    });
+  </script>
 </body>
 </html>
