@@ -9,10 +9,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // ←ここだけ自分のに戻す
+  apiKey: "AIzaSyAFke1UF4RkI-Y7HXX7x0I5gfPnls9Bod8",
   authDomain: "anonymous-voting-72546.firebaseapp.com",
   projectId: "anonymous-voting-72546",
-  storageBucket: "anonymous-voting-72546.appspot.com",
+  storageBucket: "anonymous-voting-72546.firebasestorage.app",
   messagingSenderId: "122187938085",
   appId: "1:122187938085:web:3851149bbb70950a1dc2cc"
 };
@@ -54,13 +54,12 @@ async function createPollsIfNotExist() {
   }
 }
 
-// 投票（1人1回 + 競合防止）
+// 投票（1回制限）
 async function vote(pollId, index) {
   const key = "voted_" + pollId;
 
-  // すでに投票済み
-  if (localStorage.getItem(key)) {
-    alert("You have already voted!");
+  if (localStorage.getItem(key) === "true") {
+    alert("You already voted!");
     return;
   }
 
@@ -68,20 +67,19 @@ async function vote(pollId, index) {
 
   try {
     await runTransaction(db, async (transaction) => {
-      const docSnap = await transaction.get(pollRef);
-      const data = docSnap.data();
+      const snap = await transaction.get(pollRef);
+      const data = snap.data();
 
-      data.votes[index] += 1;
+      data.votes[index]++;
 
       transaction.update(pollRef, {
         votes: data.votes
       });
     });
 
-    // 投票済み記録
     localStorage.setItem(key, "true");
 
-    // ボタン無効化（即時反映）
+    // ボタン全部無効化
     document.querySelectorAll(`[data-poll="${pollId}"] button`)
       .forEach(btn => btn.disabled = true);
 
@@ -108,8 +106,7 @@ function renderPoll(docSnap, container) {
     btn.innerText = opt;
     btn.style.marginRight = "5px";
 
-    // 投票済みなら無効
-    if (localStorage.getItem(key)) {
+    if (localStorage.getItem(key) === "true") {
       btn.disabled = true;
     }
 
@@ -141,12 +138,11 @@ function renderPoll(docSnap, container) {
   container.appendChild(pollDiv);
 }
 
-// 初期化
+// 実行
 await createPollsIfNotExist();
 
 const container = document.getElementById("polls");
 
-// 表示
 for (const poll of pollsData) {
   const pollRef = doc(db, "polls", poll.id);
   const docSnap = await getDoc(pollRef);
