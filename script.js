@@ -1,48 +1,157 @@
-let votes = [
-[0, 0, 0, 0], // Q1
-[0, 0],       // Q2
-[0, 0]        // Q3
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY", // ←ここだけ自分のに戻す
+  authDomain: "anonymous-voting-72546.firebaseapp.com",
+  projectId: "anonymous-voting-72546",
+  storageBucket: "anonymous-voting-72546.appspot.com",
+  messagingSenderId: "122187938085",
+  appId: "1:122187938085:web:3851149bbb70950a1dc2cc"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const pollsData = [
+  {
+    id: "curfew",
+    question: "If the Curfew can be extended, when do you want it to be?",
+    options: ["7pm", "8pm", "9pm", "10pm"]
+  },
+  {
+    id: "acai",
+    question: "Which acai bowl do you prefer to Uber?",
+    options: ["Playa", "Sobol"]
+  },
+  {
+    id: "anime",
+    question: "Which Japanese anime is famous worldwide?",
+    options: ["Pikachu", "Doraemon"]
+  }
 ];
 
-let voted = [false, false, false];
+// 初期データ作成
+async function createPollsIfNotExist() {
+  for (const poll of pollsData) {
+    const pollRef = doc(db, "polls", poll.id);
+    const docSnap = await getDoc(pollRef);
 
-function vote(questionIndex, optionIndex) {
-
-if (voted[questionIndex]) {
-alert("You have already voted for this question!");
-return;
+    if (!docSnap.exists()) {
+      await setDoc(pollRef, {
+        question: poll.question,
+        options: poll.options,
+        votes: new Array(poll.options.length).fill(0)
+      });
+    }
+  }
 }
 
-votes[questionIndex][optionIndex]++;
-voted[questionIndex] = true;
+// 投票（1人1回 + 競合防止）
+async function vote(pollId, index) {
+  const key = "voted_" + pollId;
 
-// その質問のボタンだけ無効化
-const pollDiv = document.getElementsByClassName("poll")[questionIndex];
-pollDiv.querySelectorAll("button").forEach(btn => btn.disabled = true);
+  // すでに投票済み
+  if (localStorage.getItem(key)) {
+    alert("You have already voted!");
+    return;
+  }
 
-updateResultsDisplay(questionIndex);
+  const pollRef = doc(db, "polls", pollId);
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const docSnap = await transaction.get(pollRef);
+      const data = docSnap.data();
+
+      data.votes[index] += 1;
+
+      transaction.update(pollRef, {
+        votes: data.votes
+      });
+    });
+
+    // 投票済み記録
+    localStorage.setItem(key, "true");
+
+    // ボタン無効化（即時反映）
+    document.querySelectorAll(`[data-poll="${pollId}"] button`)
+      .forEach(btn => btn.disabled = true);
+
+  } catch (e) {
+    console.error("Transaction failed:", e);
+  }
 }
 
-function updateResultsDisplay(qIndex) {
+// UI表示
+function renderPoll(docSnap, container) {
+  const data = docSnap.data();
+  const pollDiv = document.createElement("div");
+  pollDiv.style.marginBottom = "20px";
+  pollDiv.setAttribute("data-poll", docSnap.id);
 
-let resultsText = "<strong>Results:</strong><br>";
+  const title = document.createElement("h2");
+  title.innerText = data.question;
+  pollDiv.appendChild(title);
 
-if (qIndex === 0) {
-resultsText += `7pm: ${votes[0][0]}<br>
-8pm: ${votes[0][1]}<br>
-9pm: ${votes[0][2]}<br>
-10pm: ${votes[0][3]}`;
+  const key = "voted_" + docSnap.id;
+
+  data.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.innerText = opt;
+    btn.style.marginRight = "5px";
+
+    // 投票済みなら無効
+    if (localStorage.getItem(key)) {
+      btn.disabled = true;
+    }
+
+    btn.onclick = () => vote(docSnap.id, i);
+    pollDiv.appendChild(btn);
+  });
+
+  const resultsDiv = document.createElement("div");
+  resultsDiv.style.marginTop = "10px";
+
+  const updateResults = () => {
+    resultsDiv.innerHTML = "<b>Results:</b><br>";
+    data.options.forEach((opt, i) => {
+      resultsDiv.innerHTML += `${opt}: ${data.votes[i]} votes<br>`;
+    });
+  };
+
+  updateResults();
+  pollDiv.appendChild(resultsDiv);
+
+  // リアルタイム更新
+  const pollRef = doc(db, "polls", docSnap.id);
+  onSnapshot(pollRef, (snap) => {
+    const updatedData = snap.data();
+    data.votes = updatedData.votes;
+    updateResults();
+  });
+
+  container.appendChild(pollDiv);
 }
 
-if (qIndex === 1) {
-resultsText += `Playa: ${votes[1][0]}<br>
-Sobol: ${votes[1][1]}`;
-}
+// 初期化
+await createPollsIfNotExist();
 
-if (qIndex === 2) {
-resultsText += `Pikachu: ${votes[2][0]}<br>
-Doraemon: ${votes[2][1]}`;
-}
+const container = document.getElementById("polls");
 
-document.getElementById("results" + qIndex).innerHTML = resultsText;
+// 表示
+for (const poll of pollsData) {
+  const pollRef = doc(db, "polls", poll.id);
+  const docSnap = await getDoc(pollRef);
+
+  if (docSnap.exists()) {
+    renderPoll(docSnap, container);
+  }
 }
