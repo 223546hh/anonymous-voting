@@ -1,54 +1,81 @@
-<style>
-  body { 
-    font-family: sans-serif; 
-    padding: 20px; 
-    line-height: 1.6; 
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Anonymous Voting - Page 1</title>
+  <style>
+    body { 
+      font-family: sans-serif; 
+      padding: 20px; 
+      line-height: 1.6; 
+      margin: 0;
+      /* 背景が読み込めない時のために背景色を設定 */
+      background-color: #f0f0f0; 
+      /* ★ここをリポジトリにあるファイル名と一字一句合わせてください */
+      background-image: url('./IMG_6968.jpg'); 
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+    }
+
+    h1 { 
+      color: #333; /* 背景がない時でも見えるように一旦暗い色に */
+      text-shadow: 1px 1px 2px white;
+    }
+
+    #polls > div {
+      background-color: rgba(255, 255, 255, 0.9); /* 白背景を濃くしました */
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      color: #333;
+    }
+
+    button { 
+      cursor: pointer; 
+      padding: 10px 20px; 
+      margin: 5px; 
+      border-radius: 6px; 
+      border: 1px solid #ccc; 
+      background-color: #fff;
+      font-weight: bold;
+    }
     
-    /* ★背景画像の設定（IMG_6968.jpgを使用） */
-    background-image: url('./IMG_6968.jpg'); 
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-  }
+    button:disabled { background-color: #ddd; color: #888; cursor: not-allowed; }
+    
+    .nav-link { 
+      margin-top: 40px; 
+      padding: 20px; 
+      background: rgba(0,0,0,0.6); /* 黒い半透明の枠 */
+      color: white; 
+      border-radius: 10px;
+    }
 
-  /* ★タイトルを画像の上でも読みやすくする（白文字＋影） */
-  h1 { 
-    color: white; 
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-  }
+    .next-page-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 24px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Anonymous Voting (Page 1)</h1>
 
-  /* ★質問エリアを半透明の白にして、文字を読みやすくする */
-  #polls > div {
-    background-color: rgba(255, 255, 255, 0.85);
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  }
+  <div id="polls"></div>
 
-  button { cursor: pointer; padding: 8px 15px; margin: 5px; border-radius: 4px; border: 1px solid #ddd; background-color: white; }
-  button:disabled { background-color: #eee; cursor: not-allowed; }
-  
-  .nav-link { 
-    margin-top: 40px; 
-    padding: 20px; 
-    border-top: 2px solid rgba(255,255,255,0.3); 
-    color: white; /* 説明文を白にする */
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-  }
+  <div class="nav-link">
+    <p>Wait until next presentation. 次のプレゼンまで押さないで。</p>
+    <a href="page2.html" class="next-page-btn">二ページ目</a>
+  </div>
 
-  .next-page-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    text-shadow: none; /* ボタンの文字の影は消す */
-  }
-  .next-page-btn:hover {
-    background-color: #0056b3;
-  }
-</style>
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
