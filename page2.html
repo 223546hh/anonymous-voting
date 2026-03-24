@@ -4,9 +4,66 @@
   <meta charset="UTF-8">
   <title>Anonymous Voting - Page 2</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-    button { cursor: pointer; padding: 5px 10px; margin: 5px; }
-    .nav-link { margin-top: 30px; padding: 10px; border-top: 1px solid #ccc; }
+    body { 
+      font-family: sans-serif; 
+      padding: 20px; 
+      line-height: 1.6; 
+      
+      /* ★背景画像の設定 */
+      background-image: url('./IMG_6968.jpg'); 
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+
+    /* ★タイトルを白文字にして影をつける */
+    h1 { 
+      color: white; 
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    }
+
+    /* ★質問エリアを白く浮かせる */
+    #polls > div {
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    button { 
+      cursor: pointer; 
+      padding: 8px 15px; 
+      margin: 5px; 
+      border-radius: 4px; 
+      border: 1px solid #ddd; 
+      background-color: white; 
+    }
+    
+    button:disabled { 
+      background-color: #eee; 
+      cursor: not-allowed; 
+    }
+
+    .nav-link { 
+      margin-top: 30px; 
+      padding: 10px; 
+      border-top: 1px solid rgba(255,255,255,0.3); 
+    }
+
+    /* ★戻るリンクをボタンっぽくする（任意） */
+    .nav-link a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 8px 15px;
+      border-radius: 5px;
+    }
+    .nav-link a:hover {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
   </style>
 </head>
 <body>
