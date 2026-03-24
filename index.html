@@ -1,15 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Anonymous Voting</title>
+  <title>Anonymous Voting - Page 1</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+    button { cursor: pointer; padding: 5px 10px; margin: 5px; }
+    .nav-link { margin-top: 30px; padding: 10px; border-top: 1px solid #ccc; }
+  </style>
 </head>
 <body>
-  <h1>Anonymous Voting</h1>
+  <h1>Anonymous Voting (Page 1)</h1>
 
   <div id="polls"></div>
 
-  <!-- ★ これ重要：./ をつける -->
+  <div class="nav-link">
+    <a href="page2.html">Go to Page 2 (New Polls) →</a>
+  </div>
+
   <script type="module" src="./script.js"></script>
 </body>
 </html>
