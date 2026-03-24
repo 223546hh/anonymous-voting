@@ -23,7 +23,7 @@ const db = getFirestore(app);
 // 🔥 ページ2専用の質問
 const pollsData = [
   {
-    id: "investment",
+    id: "investment_page2", // ページ2専用ID
     question: "Which one do you want to invest in the most?",
     options: [
       "Dorm-Voice",
