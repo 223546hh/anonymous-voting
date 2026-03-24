@@ -5,8 +5,28 @@
   <title>Anonymous Voting - Page 1</title>
   <style>
     body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-    button { cursor: pointer; padding: 5px 10px; margin: 5px; }
-    .nav-link { margin-top: 30px; padding: 10px; border-top: 1px solid #ccc; }
+    h1 { color: #333; }
+    button { cursor: pointer; padding: 8px 15px; margin: 5px; border-radius: 4px; border: 1px solid #ddd; }
+    button:disabled { background-color: #eee; cursor: not-allowed; }
+    
+    /* ★ここが重要：リンクをボタンのように見せるデザイン */
+    .nav-link { 
+      margin-top: 40px; 
+      padding: 20px; 
+      border-top: 2px solid #eee; 
+    }
+    .next-page-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .next-page-btn:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -15,7 +35,8 @@
   <div id="polls"></div>
 
   <div class="nav-link">
-    <a href="page2.html">Go to Page 2 (New Polls) →</a>
+    <p>もっと他の質問に回答しますか？</p>
+    <a href="page2.html" class="next-page-btn">ページ2へ進む（新しい質問） →</a>
   </div>
 
   <script type="module" src="./script.js"></script>
